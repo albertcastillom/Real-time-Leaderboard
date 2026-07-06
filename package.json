@@ -1,0 +1,26 @@
+{
+  "name": "real-time-leaderboard",
+  "version": "1.0.0",
+  "description": "This project involves creating a backend system for a real-time leaderboard service. This system will later be modified and used in a screen time app.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/albertcastillom/Real-time-Leaderboard.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/albertcastillom/Real-time-Leaderboard/issues"
+  },
+  "homepage": "https://github.com/albertcastillom/Real-time-Leaderboard#readme",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "redis": "^6.1.0"
+  }
+}
