@@ -1,15 +1,17 @@
 const Router = require("express").Router();
+const { redisClient } = require("../db/redisClient.js");
 
-// Sample route
-Router.get("/", (req, res) => {
-  // fetch from redis
-  const leaderboardData = [
-    { username: "user1", score: 100 },
-    { username: "user2", score: 90 },
-    { username: "user3", score: 80 },
-  ];
-
-  res.status(200).json(leaderboardData);
+// fetch leaaderboard data
+Router.get("/", async (req, res) => {
+  try {
+    const results = await redisClient.zRangeWithScores("leaderboard", 0, -1, {
+      REV: true,
+    });
+    res.json(results);
+  } catch (error) {
+    console.error("Error fetching leaderboard:", error);
+    res.status(500).json({ message: "Error fetching leaderboard" });
+  }
 });
 
 module.exports = Router;
