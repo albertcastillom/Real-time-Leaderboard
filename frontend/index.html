@@ -3,23 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
     <title>Real Time Leaderboard</title>
 </head>
 <body>
-    <h1>Real Time Leaderboard</h1>
-    <div id="leaderboard">
-        <table>
-            <thead>
-                <tr>
-                    <th>Rank</th>
-                    <th>Name</th>
-                    <th>Score</th>
-                </tr>
-            </thead>
-            <tbody id="leaderboard-body">
-                <!-- Leaderboard entries will be dynamically inserted here -->
-            </tbody>
-        </table>
+    <div class="flex-container">
+        <div id = game-container>
+            <h1>Target Practice</h1>
+
+            <button id="start-button">Start Game</button>
+            <div id="stopwatch">Time: </div>
+            
+            <div id = "game-area-grid">
+                <div class="target"></div> 
+                <div class="target"></div> 
+                <div class="target"></div> 
+                <div class="target"></div> 
+                 <div class="target"></div> 
+                <div class="target"></div> 
+                <div class="target"></div> 
+                <div class="target"></div> 
+                 <div class="target"></div> 
+                <div class="target"></div> 
+                <div class="target"></div> 
+                <div class="target"></div> 
+                 <div class="target"></div> 
+                <div class="target"></div> 
+                <div class="target"></div> 
+                <div class="target"></div> 
+            </div>
+        </div>
+        <div id="leaderboard-container">
+            <h1>Leaderboard</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Name</th>
+                        <th>Score</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-body">
+                    <!-- Leaderboard entries will be dynamically inserted here -->
+                </tbody>
+            </table>
+
+            <div id="score-form">
+                <h2>Submit Your Score</h2>
+                <form id="submit-score-form">
+                    <input type="text" id="name" placeholder="Your Name" required>
+                    <input type="number" id="score" placeholder="Your Score" required>
+                    <button type="submit">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
     <script src="script.js"></script>
 </body>
 </html>
