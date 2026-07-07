@@ -27,8 +27,7 @@ body{
   text-align: center;
   width: 40%;
   display: flex;
-   flex-direction: column;
-
+flex-direction: column;
 }
 
 
@@ -61,4 +60,23 @@ body{
   border: none;
   border-radius: 5px;
   cursor: pointer;
+}
+
+#score-form {
+  margin-top: 20px;
+  text-align: center;
+  padding-bottom: 50px;
+
+}
+
+/* Target WebKit browsers (Chrome, Safari, Edge, Opera) */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Target Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
 }
