@@ -1,6 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const { redisClient } = require("./db/redisClient.js");
+const path = require("path");
+require("dotenv").config();
 
 const http = require("http");
 const { Server } = require("socket.io");
@@ -24,6 +26,7 @@ const io = new Server(server, {
 app.use(express.json());
 //CORS middleware
 app.use(cors());
+app.use(express.static(__dirname), "public");
 
 app.set("io", io);
 
@@ -44,7 +47,7 @@ async function startServer() {
   console.log("Connected to Redis");
 
   server.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
+    console.log(`Server is running on port: ${port}`);
   });
 }
 

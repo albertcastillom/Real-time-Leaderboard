@@ -21,6 +21,7 @@
   "homepage": "https://github.com/albertcastillom/Real-time-Leaderboard#readme",
   "dependencies": {
     "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "redis": "^6.1.0",
     "socket.io": "^4.8.3"
