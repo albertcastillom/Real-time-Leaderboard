@@ -15,12 +15,9 @@ const addScore = async (req, res) => {
       return res.status(400).json({ message: "Score must be a number" });
     }
 
-    //Truncate score to 2 decimal places, e.g. 39.9999 stay at 39.99
-    const roundedScore = Math.floor(score * 100) / 100;
-
     // save to redis, but only if its a higher score than the previous one
     const previousScore = await redisClient.zScore("leaderboard", username);
-    if (previousScore !== null && roundedScore >= previousScore) {
+    if (previousScore !== null && score >= previousScore) {
       return res.status(200).json({
         message: "Score not saved. Previous score is lower or equal.",
         username,
@@ -29,7 +26,7 @@ const addScore = async (req, res) => {
     }
 
     await redisClient.zAdd("leaderboard", {
-      score: roundedScore,
+      score: score,
       value: username,
     });
 
@@ -41,7 +38,7 @@ const addScore = async (req, res) => {
     res.status(200).json({
       message: "Score saved successfully",
       username,
-      score: roundedScore,
+      score: score,
     });
   } catch (error) {
     console.error("Error saving score:", error);

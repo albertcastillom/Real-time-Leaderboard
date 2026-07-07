@@ -1,5 +1,5 @@
 //socket.io setup
-const socket = io("http://localhost:3000");
+const socket = io();
 
 socket.on("leaderboard:update", (leaderboard) => {
   fetchLeaderboard(leaderboard);
@@ -43,7 +43,7 @@ function resetTimer() {
 // Calculates elapsed time components and updates the DOM
 function updateDisplay() {
   //elapsed time in ms format
-  let elapsedTime = Date.now() - startTime;
+  //let elapsedTime = Date.now() - startTime;
 
   let seconds = Math.floor((elapsedTime % (1000 * 60)) / 1000);
   let centiseconds = Math.floor((elapsedTime % 1000) / 10);
@@ -81,10 +81,8 @@ function submitScore() {
   const display = document.getElementById("display");
   const displayTime = display.textContent;
   //clean scroe from display to be sumbitted to backend
-  const score =
-    displayTime === "00:00"
-      ? 0
-      : parseFloat(displayTime.split(":")[0] + "." + displayTime.split(":")[1]);
+  //const score =displayTime === "00:00"? 0: parseFloat(displayTime.split(":")[0] + "." + displayTime.split(":")[1]);
+  const score = Number((elapsedTime / 1000).toFixed(2));
 
   //make score card with name input to submit to backend
   const title = document.createElement("h2");
@@ -133,7 +131,7 @@ function submitScore() {
       return;
     }
 
-    fetch("http://localhost:3000/api/score", {
+    fetch("/api/score", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -170,7 +168,7 @@ function resetGame() {
 
 //Retrieve leaderboard from backend and display it
 function fetchLeaderboard() {
-  fetch("http://localhost:3000/api/leaderboard/top") //top 10 scores
+  fetch("/api/leaderboard/top") //top 10 scores
     .then((response) => response.json())
     .then((data) => {
       const leaderboard = data;
