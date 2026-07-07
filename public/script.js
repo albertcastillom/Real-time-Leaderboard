@@ -15,6 +15,16 @@ const display = document.getElementById("display");
 
 function startTimer() {
   resetGame(); // Reset timer before starting
+  //clear old scores that werent submitted
+  const scoreDiv = document.getElementById("submit-score-form");
+  const submitScoreHeader = document.getElementById("submitScoreHeader");
+  if (scoreDiv) {
+    scoreDiv.textContent = "";
+  }
+  if (submitScoreHeader) {
+    submitScoreHeader.textContent = "";
+  }
+
   if (!isRunning) {
     isRunning = true;
     // Adjusts start time if resuming from a paused state
@@ -86,6 +96,7 @@ function submitScore() {
 
   //make score card with name input to submit to backend
   const title = document.createElement("h2");
+  title.id = "submitScoreHeader";
   title.textContent = "Submit Your Score";
   const form = document.createElement("form");
   form.id = "submit-score-form";
