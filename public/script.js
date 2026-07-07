@@ -43,7 +43,7 @@ function resetTimer() {
 // Calculates elapsed time components and updates the DOM
 function updateDisplay() {
   //elapsed time in ms format
-  //let elapsedTime = Date.now() - startTime;
+  elapsedTime = Date.now() - startTime;
 
   let seconds = Math.floor((elapsedTime % (1000 * 60)) / 1000);
   let centiseconds = Math.floor((elapsedTime % 1000) / 10);
