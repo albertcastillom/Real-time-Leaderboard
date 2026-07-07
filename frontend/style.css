@@ -14,6 +14,16 @@ body{
   text-align: center;
   margin-top: 20px;
    width: 60%;
+   padding: 20px;
+}
+
+#leaderboard-container{
+  margin-top: 20px;
+  text-align: center;
+  width: 40%;
+   padding: 20px;
+  display: flex;
+flex-direction: column;
 }
 
 #game-area-grid {
@@ -22,14 +32,11 @@ body{
   gap: 15px;
 }
 
-#leaderboard-container{
-  margin-top: 20px;
-  text-align: center;
-  width: 40%;
-  display: flex;
-flex-direction: column;
-}
 
+#display{
+  padding: 10px 20px;
+  font-size: 36px;
+}
 
 .target{
   /* Step 1: Create a perfect square */

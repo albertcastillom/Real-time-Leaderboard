@@ -1,3 +1,11 @@
+//socket.io setup
+const socket = io("http://localhost:3000");
+
+socket.on("leaderboard:update", (leaderboard) => {
+  fetchLeaderboard(leaderboard);
+});
+
+//timer setip
 let startTime = 0;
 let elapsedTime = 0;
 let timerInterval = null;
@@ -6,7 +14,7 @@ let isRunning = false;
 const display = document.getElementById("display");
 
 function startTimer() {
-  console.log("Start button clicked");
+  resetGame(); // Reset timer before starting
   if (!isRunning) {
     isRunning = true;
     // Adjusts start time if resuming from a paused state
@@ -23,7 +31,7 @@ function stopTimer() {
   }
 }
 
-// Resets to 0
+// Reset to 0
 function resetTimer() {
   isRunning = false;
   clearInterval(timerInterval);
@@ -51,6 +59,7 @@ function updateDisplay() {
 const targets = document.querySelectorAll(".target");
 let targetsHit = 0;
 
+//set event for each target
 targets.forEach((target) => {
   target.addEventListener("click", () => {
     if (isRunning) {
@@ -124,7 +133,7 @@ function submitScore() {
       return;
     }
 
-    fetch("/api/scores", {
+    fetch("http://localhost:3000/api/score", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -133,9 +142,14 @@ function submitScore() {
     })
       .then((response) => response.json())
       .then((data) => {
-        alert(data.message);
-        // Optionally, you can reset the game here
+        //resert game after score submission
         resetGame();
+        //remove form after submission
+        form.remove();
+        scoreDisplay.remove();
+        title.remove();
+        //refresh leaderboard after submission
+        //fetchLeaderboard();
       })
       .catch((error) => {
         console.error("Error submitting score:", error);
@@ -148,8 +162,42 @@ function submitScore() {
 function resetGame() {
   targetsHit = 0;
   targets.forEach((target) => {
-    target.style.backgroundColor = ""; // Reset color
+    target.style.backgroundImage = `repeating-radial-gradient(circle, #ff3b30, #ff3b30 20px, #ffffff 20px, #ffffff 40px)`; // Reset color
     target.style.pointerEvents = "auto"; // Enable clicks
   });
   resetTimer();
 }
+
+//Retrieve leaderboard from backend and display it
+function fetchLeaderboard() {
+  fetch("http://localhost:3000/api/leaderboard/top") //top 10 scores
+    .then((response) => response.json())
+    .then((data) => {
+      const leaderboard = data;
+      const leaderboardTable = document.getElementById("leaderboard-body");
+      leaderboardTable.innerHTML = ""; // Clear existing list
+
+      leaderboard.forEach((entry, index) => {
+        const tableRow = document.createElement("tr");
+        const rankCell = document.createElement("td");
+        const nameCell = document.createElement("td");
+        const scoreCell = document.createElement("td");
+
+        rankCell.textContent = index + 1;
+        nameCell.textContent = entry.value;
+        scoreCell.textContent = entry.score;
+
+        tableRow.appendChild(rankCell);
+        tableRow.appendChild(nameCell);
+        tableRow.appendChild(scoreCell);
+
+        leaderboardTable.appendChild(tableRow);
+      });
+    })
+    .catch((error) => {
+      console.error("Error fetching leaderboard:", error);
+    });
+}
+
+// Fetch leaderboard on page load
+window.addEventListener("load", fetchLeaderboard);

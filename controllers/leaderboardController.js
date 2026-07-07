@@ -2,9 +2,7 @@ const { redisClient } = require("../db/redisClient.js");
 
 const getLeaderboard = async (req, res) => {
   try {
-    const results = await redisClient.zRangeWithScores("leaderboard", 0, -1, {
-      REV: true,
-    });
+    const results = await redisClient.zRangeWithScores("leaderboard", 0, -1);
     res.json(results);
   } catch (error) {
     console.error("Error fetching leaderboard:", error);
@@ -14,9 +12,7 @@ const getLeaderboard = async (req, res) => {
 
 const getTopScores = async (req, res) => {
   try {
-    const results = await redisClient.zRangeWithScores("leaderboard", 0, 9, {
-      REV: true,
-    });
+    const results = await redisClient.zRangeWithScores("leaderboard", 0, 9);
     res.json(results);
   } catch (error) {
     console.error("Error fetching top scores:", error);
