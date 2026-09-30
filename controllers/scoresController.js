@@ -15,11 +15,11 @@ const addScore = async (req, res) => {
       return res.status(400).json({ message: "Score must be a number" });
     }
 
-    // save to redis, but only if its a higher score than the previous one
+    // Save only a player's highest target count.
     const previousScore = await redisClient.zScore("leaderboard", username);
-    if (previousScore !== null && score >= previousScore) {
+    if (previousScore !== null && score <= previousScore) {
       return res.status(200).json({
-        message: "Score not saved. Previous score is lower or equal.",
+        message: "Score not saved. Previous score is higher or equal.",
         username,
         score: previousScore,
       });
@@ -30,7 +30,9 @@ const addScore = async (req, res) => {
       value: username,
     });
 
-    const leaderboard = await redisClient.zRangeWithScores("leaderboard", 0, 9);
+    const leaderboard = await redisClient.zRangeWithScores("leaderboard", 0, 9, {
+      REV: true,
+    });
 
     const io = req.app.get("io");
     io.emit("leaderboard:update", leaderboard);

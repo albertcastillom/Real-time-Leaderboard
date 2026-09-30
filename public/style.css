@@ -26,37 +26,47 @@ body{
 flex-direction: column;
 }
 
-#game-area-grid {
-  display: grid;
-  grid: auto / 4fr 4fr 4fr 4fr;
-  gap: 15px;
+#game-area {
+  position: relative;
+  width: 100%;
+  height: min(65vh, 650px);
+  min-height: 420px;
+  overflow: hidden;
+  border: 2px solid #d8d8d8;
+  border-radius: 12px;
+  background: #ffffff;
 }
 
-
-#display{
-  padding: 10px 20px;
+.game-stats {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  padding: 14px 20px;
   font-size: 36px;
 }
 
 .target{
-  /* Step 1: Create a perfect square */
-  width: 200px;
-  height: 200px;
-  
-  /* Step 2: Turn the square into a circle */
+  position: absolute;
+  display: none;
+  width: 90px;
+  height: 90px;
+  padding: 0;
+  border: 0;
   border-radius: 50%;
-  
-  /* Step 3: Draw alternating rings using a gradient */
   background: repeating-radial-gradient(
     circle,
-    #ff3b30,       /* Inner bullseye color */
-    #ff3b30 20px,  /* Ring thickness boundary */
-    #ffffff 20px,  /* Next ring color starts exactly where the last ended */
-    #ffffff 40px   /* Next ring thickness boundary */
+    #ff3b30,
+    #ff3b30 15px,
+    #ffffff 15px,
+    #ffffff 30px
   );
-  
-  /* Optional visual polished look */
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  cursor: crosshair;
+  touch-action: manipulation;
+}
+
+.target.is-visible {
+  display: block;
 }
 
 #start-button {
@@ -67,6 +77,11 @@ flex-direction: column;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+}
+
+#start-button:disabled {
+  background-color: #7daee2;
+  cursor: not-allowed;
 }
 
 #score-form {

@@ -11,32 +11,18 @@
         <div id = game-container>
             <h1>Target Practice</h1>
             
-            <button id="start-button" onclick="startTimer()">Start Game</button>
-            <div id="display">00:00</div>
+            <button id="start-button" type="button">Start Game</button>
+            <div class="game-stats" aria-live="polite">
+                <span id="display">15.00 seconds</span>
+                <span id="score-display">Score: 0</span>
+            </div>
 
-            <div id = "game-area-grid">
-                <div class="target"></div> 
-                <div class="target"></div> 
-                <div class="target"></div> 
-                <div class="target"></div> 
-                <div class="target"></div> 
-                <div class="target"></div> 
-                <div class="target"></div> 
-                <div class="target"></div> 
-                <div class="target"></div> 
-                <div class="target"></div> 
-                <div class="target"></div> 
-                <div class="target"></div> 
-                <div class="target"></div> 
-                <div class="target"></div> 
-                <div class="target"></div> 
-                <div class="target"></div> 
+            <div id="game-area" aria-label="Target practice game area">
+                <button class="target" type="button" aria-label="Target"></button>
             </div>
         </div>
         <div id="leaderboard-container">
             <h1>Leaderboard</h1>
-            <div id="score-form">
-            </div>
             <table>
                 <thead>
                     <tr>
