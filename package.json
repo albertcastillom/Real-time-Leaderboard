@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "npm run redis:start && npm start",
+    "docker:up": "docker compose up --build",
+    "docker:down": "docker compose down",
     "redis:start": "redis-cli ping > /dev/null 2>&1 || redis-server --daemonize yes",
     "redis:stop": "redis-cli shutdown",
     "test": "echo \"Error: no test specified\" && exit 1",

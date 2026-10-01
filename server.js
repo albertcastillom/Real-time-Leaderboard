@@ -10,6 +10,7 @@ const { Server } = require("socket.io");
 //route imports
 const scoreRoute = require("./routes/scores");
 const leaderboardRoute = require("./routes/leaderboard");
+const healthRoute = require("./routes/health");
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -32,6 +33,7 @@ app.set("io", io);
 // routes
 app.use("/api/score", scoreRoute);
 app.use("/api/leaderboard", leaderboardRoute);
+app.use("/api/health", healthRoute);
 
 io.on("connection", (socket) => {
   console.log("Client Connected", socket.id);
@@ -50,5 +52,27 @@ async function startServer() {
   });
 }
 
-// Start the server
-startServer();
+let isShuttingDown = false;
+
+function shutdown(signal) {
+  if (isShuttingDown) return;
+  isShuttingDown = true;
+  console.log(`${signal} received. Shutting down gracefully.`);
+
+  server.close(async () => {
+    if (redisClient.isOpen) {
+      await redisClient.quit();
+    }
+    process.exit(0);
+  });
+
+  setTimeout(() => process.exit(1), 10_000).unref();
+}
+
+process.once("SIGTERM", () => shutdown("SIGTERM"));
+process.once("SIGINT", () => shutdown("SIGINT"));
+
+startServer().catch((error) => {
+  console.error("Failed to start server:", error);
+  process.exit(1);
+});

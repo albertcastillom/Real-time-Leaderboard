@@ -24,14 +24,7 @@ const getTopScores = async (req, res) => {
   }
 };
 
-const deleteLeaderboard = async (req, res) => {
-  try {
-    await redisClient.del("leaderboard");
-    res.json({ message: "Leaderboard deleted successfully" });
-  } catch (error) {
-    console.error("Error deleting leaderboard:", error);
-    res.status(500).json({ message: "Error deleting leaderboard" });
-  }
+module.exports = {
+  getLeaderboard,
+  getTopScores,
 };
-
-module.exports = { getLeaderboard, getTopScores, deleteLeaderboard };
