@@ -69,6 +69,28 @@ flex-direction: column;
   display: block;
 }
 
+.difficulty-selection {
+  margin-top: 20px;
+  text-align: center;
+  padding-bottom: 20px;
+}
+
+label {
+  font-size: 24px;
+  margin-right: 10px;
+}
+
+#easy-button, #medium-button, #hard-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  margin: 0 5px;
+  background-color: #007BFF;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
 #start-button {
   padding: 10px 20px;
   font-size: 16px;
