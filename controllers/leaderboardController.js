@@ -2,7 +2,17 @@ const { redisClient } = require("../db/redisClient.js");
 
 const getLeaderboard = async (req, res) => {
   try {
-    const results = await redisClient.zRangeWithScores("leaderboard", 0, -1, {
+    const difficulty = req.query.difficulty;
+    const validDifficulties = ["easy", "medium", "hard"];
+
+    if (!validDifficulties.includes(difficulty)) {
+      return res.status(400).json({
+        message: "Invalid or missing difficulty",
+      });
+    }
+    const leaderboardKey = `leaderboard:${difficulty}`;
+
+    const results = await redisClient.zRangeWithScores(leaderboardKey, 0, -1, {
       REV: true,
     });
     res.json(results);
@@ -14,7 +24,17 @@ const getLeaderboard = async (req, res) => {
 
 const getTopScores = async (req, res) => {
   try {
-    const results = await redisClient.zRangeWithScores("leaderboard", 0, 9, {
+    const difficulty = req.query.difficulty;
+    const validDifficulties = ["easy", "medium", "hard"];
+
+    if (!validDifficulties.includes(difficulty)) {
+      return res.status(400).json({
+        message: "Invalid or missing difficulty",
+      });
+    }
+    const leaderboardKey = `leaderboard:${difficulty}`;
+
+    const results = await redisClient.zRangeWithScores(leaderboardKey, 0, 9, {
       REV: true,
     });
     res.json(results);

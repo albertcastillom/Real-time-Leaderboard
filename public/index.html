@@ -11,6 +11,13 @@
         <div id = game-container>
             <h1>Target Practice</h1>
             
+            <div class="difficulty-selection">
+                <label for="difficulty">Select Difficulty:</label>
+                <button id="easy-button" type="button">Easy</button>
+                <button id="medium-button" type="button">Medium</button>
+                <button id="hard-button" type="button">Hard</button>
+            </div>
+
             <button id="start-button" type="button">Start Game</button>
             <div class="game-stats" aria-live="polite">
                 <span id="display">15.00 seconds</span>
@@ -18,11 +25,16 @@
             </div>
 
             <div id="game-area" aria-label="Target practice game area">
-                <button class="target" type="button" aria-label="Target"></button>
+                <button class="target" type="button" aria-label="Target" data-difficulty="medium"></button>
             </div>
         </div>
         <div id="leaderboard-container">
             <h1>Leaderboard</h1>
+            <div class="leaderboard-tabs">
+                <button class="leaderboard-tab" data-difficulty="easy" type="button">Easy</button>
+                <button class="leaderboard-tab" data-difficulty="medium" type="button">Medium</button>
+                <button class="leaderboard-tab" data-difficulty="hard" type="button">Hard</button>
+            </div>
             <table>
                 <thead>
                     <tr>

@@ -4,6 +4,7 @@ const addScore = async (req, res) => {
   try {
     const username = req.body.username;
     const score = req.body.score;
+    const difficulty = req.body.difficulty;
 
     if (!username || score === undefined) {
       return res
@@ -15,8 +16,19 @@ const addScore = async (req, res) => {
       return res.status(400).json({ message: "Score must be a number" });
     }
 
+    //validate difficulty
+    const validDiff = ["easy", "medium", "hard"];
+    if (!validDiff.includes(difficulty)) {
+      return res.status(400).json({
+        message: "Invalid Difficulty",
+      });
+    }
+
+    //construct leaderboard key
+    const leaderboardKey = `leaderboard:${difficulty}`;
+
     // Save only a player's highest target count.
-    const previousScore = await redisClient.zScore("leaderboard", username);
+    const previousScore = await redisClient.zScore(leaderboardKey, username);
     if (previousScore !== null && score <= previousScore) {
       return res.status(200).json({
         message: "Score not saved. Previous score is higher or equal.",
@@ -25,14 +37,19 @@ const addScore = async (req, res) => {
       });
     }
 
-    await redisClient.zAdd("leaderboard", {
+    await redisClient.zAdd(leaderboardKey, {
       score: score,
       value: username,
     });
 
-    const leaderboard = await redisClient.zRangeWithScores("leaderboard", 0, 9, {
-      REV: true,
-    });
+    const leaderboard = await redisClient.zRangeWithScores(
+      leaderboardKey,
+      0,
+      9,
+      {
+        REV: true,
+      },
+    );
 
     const io = req.app.get("io");
     io.emit("leaderboard:update", leaderboard);

@@ -26,6 +26,27 @@ body{
 flex-direction: column;
 }
 
+.leaderboard-tabs{
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.leaderboard-tab{
+  padding: 8px 16px;
+  border: 1px solid #007BFF;
+  border-radius: 5px;
+  color: white;
+  background-color: #007BFF;
+  cursor: pointer;
+}
+
+.leaderboard-tab.is-selected{
+  background-color: #7daee2;
+  color: white;
+}
+
 #game-area {
   position: relative;
   width: 100%;
@@ -48,8 +69,8 @@ flex-direction: column;
 .target{
   position: absolute;
   display: none;
-  width: 90px;
-  height: 90px;
+  width: var(--target-size);
+  height: var(--target-size);
   padding: 0;
   border: 0;
   border-radius: 50%;
@@ -65,8 +86,45 @@ flex-direction: column;
   touch-action: manipulation;
 }
 
+.target[data-difficulty="easy"]{
+  --target-size: 130px;
+}
+.target[data-difficulty="medium"]{
+  --target-size: 90px;
+}
+.target[data-difficulty="hard"]{
+  --target-size: 60px;
+}
+
 .target.is-visible {
   display: block;
+}
+
+.difficulty-selection {
+  margin-top: 20px;
+  text-align: center;
+  padding-bottom: 20px;
+}
+
+label {
+  font-size: 24px;
+  margin-right: 10px;
+}
+
+.difficulty-selection button {
+  padding: 10px 20px;
+  font-size: 16px;
+  margin: 0 5px;
+  background-color: #007BFF;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.difficulty-selection button.is-selected {
+  background-color: #7daee2;
+  box-shadow: 0 0 0 3px rgba(21, 87, 36, 0.25);
 }
 
 #start-button {
