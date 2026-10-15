@@ -6,15 +6,32 @@ const scoreDisplay = document.getElementById("score-display");
 const startButton = document.getElementById("start-button");
 const gameArea = document.getElementById("game-area");
 const target = document.querySelector(".target");
+const easyButton = document.getElementById("easy-button");
+const mediumButton = document.getElementById("medium-button");
+const hardButton = document.getElementById("hard-button");
 
 let score = 0;
 let endTime = 0;
 let timerInterval = null;
 let isRunning = false;
 
+const difficultyButtons = [easyButton, mediumButton, hardButton];
+
 socket.on("leaderboard:update", fetchLeaderboard);
 startButton.addEventListener("click", startGame);
 target.addEventListener("click", hitTarget);
+easyButton.addEventListener("click", () => {
+  selectDifficulty("easy");
+});
+mediumButton.addEventListener("click", () => {
+  selectDifficulty("medium");
+});
+hardButton.addEventListener("click", () => {
+  selectDifficulty("hard");
+});
+
+//make medium button selected on startup
+selectDifficulty("medium");
 
 function startGame() {
   removeScoreForm();
@@ -30,6 +47,10 @@ function startGame() {
   startButton.textContent = "Game in progress";
   target.classList.add("is-visible");
 
+  difficultyButtons.forEach((button) => {
+    button.disabled = true;
+  });
+
   positionTarget();
   timerInterval = setInterval(updateCountdown, 10);
 }
@@ -40,6 +61,19 @@ function hitTarget() {
   score += 1;
   scoreDisplay.textContent = `Score: ${score}`;
   positionTarget();
+}
+
+function selectDifficulty(difficulty) {
+  if (isRunning) return;
+
+  target.dataset.difficulty = difficulty;
+
+  difficultyButtons.forEach((button) => {
+    const isSelected = button.id === `${difficulty}-button`;
+
+    button.classList.toggle("is-selected", isSelected);
+    button.setAttribute("aria-pressed", isSelected);
+  });
 }
 
 function positionTarget() {
@@ -67,6 +101,11 @@ function finishGame() {
   display.textContent = "Time's up!";
   startButton.disabled = false;
   startButton.textContent = "Play Again";
+
+  difficultyButtons.forEach((button) => {
+    button.disabled = false;
+  });
+
   showScoreForm();
 }
 

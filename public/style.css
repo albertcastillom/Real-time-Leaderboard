@@ -48,8 +48,8 @@ flex-direction: column;
 .target{
   position: absolute;
   display: none;
-  width: 90px;
-  height: 90px;
+  width: var(--target-size);
+  height: var(--target-size);
   padding: 0;
   border: 0;
   border-radius: 50%;
@@ -63,6 +63,16 @@ flex-direction: column;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   cursor: crosshair;
   touch-action: manipulation;
+}
+
+.target[data-difficulty="easy"]{
+  --target-size: 130px;
+}
+.target[data-difficulty="medium"]{
+  --target-size: 90px;
+}
+.target[data-difficulty="hard"]{
+  --target-size: 60px;
 }
 
 .target.is-visible {
@@ -80,7 +90,7 @@ label {
   margin-right: 10px;
 }
 
-#easy-button, #medium-button, #hard-button {
+.difficulty-selection button {
   padding: 10px 20px;
   font-size: 16px;
   margin: 0 5px;
@@ -89,6 +99,11 @@ label {
   border: none;
   border-radius: 5px;
   cursor: pointer;
+}
+
+.difficulty-selection button.is-selected {
+  background-color: #7daee2;
+  box-shadow: 0 0 0 3px rgba(21, 87, 36, 0.25);
 }
 
 #start-button {
