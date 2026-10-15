@@ -21,7 +21,6 @@ env:
   ECS_SERVICE: leaderboard-prod
   ECS_SERVICE_ARN: arn:aws:ecs:us-west-2:306320707193:service/default/leaderboard-prod
   ECS_CONTAINER_NAME: Main
-  ECS_INFRASTRUCTURE_ROLE_ARN: arn:aws:iam::306320707193:role/ecsInfrastructureRoleForExpressServices
   AWS_DEPLOY_ROLE_ARN: arn:aws:iam::306320707193:role/GitHubActionsLeaderboardDeployRole
 
 jobs:
@@ -104,9 +103,65 @@ jobs:
           echo "arn=$task_definition_arn" >> "$GITHUB_OUTPUT"
 
       - name: Deploy to ECS Express Mode
-        uses: aws-actions/amazon-ecs-deploy-express-service@v1
-        with:
-          service-name: ${{ env.ECS_SERVICE }}
-          cluster: ${{ env.ECS_CLUSTER }}
-          task-definition-arn: ${{ steps.register-task-definition.outputs.arn }}
-          infrastructure-role-arn: ${{ env.ECS_INFRASTRUCTURE_ROLE_ARN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          previous_deployment_arn="$(aws ecs list-service-deployments \
+            --service "$ECS_SERVICE" \
+            --cluster "$ECS_CLUSTER" \
+            --max-results 1 \
+            --query 'serviceDeployments[0].serviceDeploymentArn' \
+            --output text)"
+
+          aws ecs update-express-gateway-service \
+            --service-arn "$ECS_SERVICE_ARN" \
+            --task-definition-arn "${{ steps.register-task-definition.outputs.arn }}" \
+            > /dev/null
+
+          deployment_arn=""
+          for attempt in {1..12}; do
+            latest_deployment_arn="$(aws ecs list-service-deployments \
+              --service "$ECS_SERVICE" \
+              --cluster "$ECS_CLUSTER" \
+              --max-results 1 \
+              --query 'serviceDeployments[0].serviceDeploymentArn' \
+              --output text)"
+
+            if [[ "$latest_deployment_arn" != "$previous_deployment_arn" && "$latest_deployment_arn" != "None" ]]; then
+              deployment_arn="$latest_deployment_arn"
+              break
+            fi
+
+            sleep 5
+          done
+
+          if [[ -z "$deployment_arn" ]]; then
+            echo "ECS did not create a new service deployment in time."
+            exit 1
+          fi
+
+          echo "Monitoring deployment: $deployment_arn"
+          for attempt in {1..60}; do
+            status="$(aws ecs describe-service-deployments \
+              --service-deployment-arns "$deployment_arn" \
+              --query 'serviceDeployments[0].status' \
+              --output text)"
+
+            echo "Deployment status: $status"
+            case "$status" in
+              SUCCESSFUL)
+                exit 0
+                ;;
+              PENDING|IN_PROGRESS)
+                sleep 15
+                ;;
+              *)
+                echo "ECS deployment failed with status: $status"
+                exit 1
+                ;;
+            esac
+          done
+
+          echo "Timed out waiting for ECS deployment."
+          exit 1
