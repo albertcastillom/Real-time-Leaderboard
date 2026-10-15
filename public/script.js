@@ -9,11 +9,18 @@ const target = document.querySelector(".target");
 const easyButton = document.getElementById("easy-button");
 const mediumButton = document.getElementById("medium-button");
 const hardButton = document.getElementById("hard-button");
+const leaderboardTabs = document.querySelectorAll(".leaderboard-tab");
 
 let score = 0;
 let endTime = 0;
 let timerInterval = null;
 let isRunning = false;
+//what the player currently chose
+let selectedDifficulty = "mediumn";
+//what difficulty the current/completed game was
+let gameDifficulty = "medium";
+//leaderboard visible
+let leaderboardDifficulty = "medium";
 
 const difficultyButtons = [easyButton, mediumButton, hardButton];
 
@@ -30,6 +37,12 @@ hardButton.addEventListener("click", () => {
   selectDifficulty("hard");
 });
 
+leaderboardTabs.forEach((tab) => {
+  tab.addEventListener("click", () => {
+    selectLeaderboardDifficulty(tab.dataset.difficulty);
+  });
+});
+
 //make medium button selected on startup
 selectDifficulty("medium");
 
@@ -40,6 +53,7 @@ function startGame() {
   score = 0;
   isRunning = true;
   endTime = Date.now() + GAME_DURATION_MS;
+  gameDifficulty = selectDifficulty;
 
   scoreDisplay.textContent = "Score: 0";
   display.textContent = "15.00 seconds";
@@ -65,7 +79,7 @@ function hitTarget() {
 
 function selectDifficulty(difficulty) {
   if (isRunning) return;
-
+  selectDifficulty = difficulty;
   target.dataset.difficulty = difficulty;
 
   difficultyButtons.forEach((button) => {
@@ -74,6 +88,16 @@ function selectDifficulty(difficulty) {
     button.classList.toggle("is-selected", isSelected);
     button.setAttribute("aria-pressed", isSelected);
   });
+}
+
+function selectLeaderboardDifficulty(difficulty) {
+  leaderboardDifficulty = difficulty;
+  leaderboardTabs.forEach((tab) => {
+    const isSelected = tab.dataset.difficulty === difficulty;
+    tab.classList.toggle("is-selected", isSelected);
+  });
+
+  fetchLeaderboard();
 }
 
 function positionTarget() {
@@ -145,7 +169,11 @@ function showScoreForm() {
       const response = await fetch("/api/score", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, score }),
+        body: JSON.stringify({
+          username,
+          score,
+          difficulty: gameDifficulty,
+        }),
       });
 
       if (!response.ok) throw new Error("The score could not be saved.");
@@ -167,7 +195,9 @@ function removeScoreForm() {
 
 async function fetchLeaderboard() {
   try {
-    const response = await fetch("/api/leaderboard/top");
+    const response = await fetch(
+      `/api/leaderboard/top?difficulty=${leaderboardDifficulty}`,
+    );
     if (!response.ok) throw new Error("The leaderboard could not be loaded.");
 
     const leaderboard = await response.json();

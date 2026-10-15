@@ -26,6 +26,27 @@ body{
 flex-direction: column;
 }
 
+.leaderboard-tabs{
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.leaderboard-tab{
+  padding: 8px 16px;
+  border: 1px solid #007BFF;
+  border-radius: 5px;
+  color: white;
+  background-color: #007BFF;
+  cursor: pointer;
+}
+
+.leaderboard-tab.is-selected{
+  background-color: #7daee2;
+  color: white;
+}
+
 #game-area {
   position: relative;
   width: 100%;
