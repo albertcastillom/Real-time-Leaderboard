@@ -79,7 +79,7 @@ function hitTarget() {
 
 function selectDifficulty(difficulty) {
   if (isRunning) return;
-  selectDifficulty = difficulty;
+  selectedDifficulty = difficulty;
   target.dataset.difficulty = difficulty;
 
   difficultyButtons.forEach((button) => {
