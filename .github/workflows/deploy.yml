@@ -1,0 +1,112 @@
+name: Deploy to production
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: production-deployment
+  cancel-in-progress: false
+
+env:
+  AWS_REGION: us-west-2
+  ECR_REPOSITORY: real-time-leaderboard
+  ECS_CLUSTER: default
+  ECS_SERVICE: leaderboard-prod
+  ECS_SERVICE_ARN: arn:aws:ecs:us-west-2:306320707193:service/default/leaderboard-prod
+  ECS_CONTAINER_NAME: Main
+  ECS_INFRASTRUCTURE_ROLE_ARN: arn:aws:iam::306320707193:role/ecsInfrastructureRoleForExpressServices
+  AWS_DEPLOY_ROLE_ARN: arn:aws:iam::306320707193:role/GitHubActionsLeaderboardDeployRole
+
+jobs:
+  deploy:
+    name: Build and deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: ${{ env.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build and push ARM64 image
+        id: build-image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          platforms: linux/arm64
+          push: true
+          tags: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Download active task definition
+        shell: bash
+        run: |
+          set -euo pipefail
+          task_definition_arn="$(aws ecs describe-express-gateway-service \
+            --service-arn "$ECS_SERVICE_ARN" \
+            --query 'service.activeConfigurations[0].taskDefinitionArn' \
+            --output text)"
+
+          aws ecs describe-task-definition \
+            --task-definition "$task_definition_arn" \
+            --query taskDefinition \
+            > task-definition.json
+
+          jq 'del(
+            .taskDefinitionArn,
+            .revision,
+            .status,
+            .requiresAttributes,
+            .compatibilities,
+            .registeredAt,
+            .registeredBy
+          )' task-definition.json > task-definition-clean.json
+
+      - name: Insert image into task definition
+        id: render-task-definition
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition-clean.json
+          container-name: ${{ env.ECS_CONTAINER_NAME }}
+          image: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+
+      - name: Register task definition
+        id: register-task-definition
+        shell: bash
+        run: |
+          set -euo pipefail
+          task_definition_arn="$(aws ecs register-task-definition \
+            --cli-input-json "file://${{ steps.render-task-definition.outputs.task-definition }}" \
+            --query 'taskDefinition.taskDefinitionArn' \
+            --output text)"
+          echo "arn=$task_definition_arn" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy to ECS Express Mode
+        uses: aws-actions/amazon-ecs-deploy-express-service@v1
+        with:
+          service-name: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          task-definition-arn: ${{ steps.register-task-definition.outputs.arn }}
+          infrastructure-role-arn: ${{ env.ECS_INFRASTRUCTURE_ROLE_ARN }}
